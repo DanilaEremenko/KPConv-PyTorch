@@ -19,6 +19,7 @@ import time
 import math
 import torch
 import torch.nn as nn
+from torch.nn import ModuleList
 from torch.nn.parameter import Parameter
 from torch.nn.init import kaiming_uniform_
 from kernels.kernel_points import load_kernels
@@ -85,6 +86,7 @@ def closest_pool(x, inds):
     """
 
     # Add a last row with minimum features for shadow pools
+    # print(f"closest pool: x = {x.shape}, inds = {inds.shape}")
     x = torch.cat((x, torch.zeros_like(x[:1, :])), 0)
 
     # Get features for each pooling location [n2, d]
@@ -412,6 +414,12 @@ def block_decider(block_name,
                         'resnetb_equivariant_strided',
                         'resnetb_invariant_strided']:
         return ResnetBottleneckBlock(block_name, in_dim, out_dim, radius, layer_ind, config)
+    elif block_name in ['resnetb_pyramid',
+                        'resnetb_deformable_pyramid',
+                        'resnetb_strided_pyramid',
+                        'resnetb_deformable_strided_pyramid'
+                        ]:
+        return PyramidBlock(block_name, in_dim, out_dim, radius, layer_ind, config)
 
     elif block_name == 'max_pool' or block_name == 'max_pool_wide':
         return MaxPoolBlock(layer_ind)
@@ -501,6 +509,58 @@ class UnaryBlock(nn.Module):
                                                                                         self.out_dim,
                                                                                         str(self.use_bn),
                                                                                         str(not self.no_relu))
+
+
+class PyramidUpsample(nn.Module):
+    def __init__(self, us, ub):
+        super().__init__()
+        self.us = us
+        self.ub = ub
+
+    def forward(self, features, batch):
+        return self.ub(self.us(features, batch), batch)
+
+
+class PyramidBlock(nn.Module):
+
+    def __init__(self, block_name, in_dim, out_dim, radius, layer_ind, config):
+        """
+        Initialize a resnet bottleneck block.
+        :param in_dim: dimension input features
+        :param out_dim: dimension input features
+        :param radius: current radius of convolution
+        :param config: parameters
+        """
+
+        super().__init__()
+        self.res_layer = ResnetBottleneckBlock(
+            block_name.replace('_pyramid', ''),
+            in_dim,
+            out_dim,
+            radius,
+            layer_ind,
+            config
+        )
+        self.up_layers = ModuleList(
+            [
+                PyramidUpsample(
+                    us=NearestUpsampleBlock(layer_ind - i),
+                    ub=UnaryBlock(
+                        in_dim // 2 ** (layer_ind - pyr_i + 1),
+                        min(64, out_dim // 2 ** (layer_ind - pyr_i + 2)),
+                        config.use_batch_norm,
+                        config.batch_norm_momentum
+                    )
+                )
+                for i, pyr_i in enumerate(range(layer_ind, 0, -1))
+
+            ]
+        )
+
+        return
+
+    def forward(self, features, batch):
+        return self.res_layer(features, batch)
 
 
 class SimpleBlock(nn.Module):

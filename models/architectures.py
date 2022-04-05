@@ -326,19 +326,58 @@ class KPFCNN(nn.Module):
 
         # Loop over consecutive blocks
         skip_x = []
+        print("----------------------------------")
+        print(f"encoding: out x.shape = {x.shape}")
+        # print('upsamples:')
+        # for i, upsample in enumerate(batch.upsamples):
+        #     print(f"{i}:upsample.shape = {upsample.shape}")
+
         for block_i, block_op in enumerate(self.encoder_blocks):
+            print(f"{block_i}.{str(block_op).split('(')[0][:-1]}:\nin x.shape = {x.shape}")
+            if isinstance(block_op, PyramidBlock):
+                x_pyr = x.clone().detach()
+                new_skip_x = []
+                for upi, uplayer in enumerate(block_op.up_layers):
+                    print(f"{upi} pyr before ups: x.shape = {x_pyr.shape}")
+                    x_pyr = uplayer(x_pyr, batch)
+                    skipx = skip_x.pop()
+                    print(f"{upi} pyr ups: x.shape = {x_pyr.shape}")
+                    print(f"{upi} pyr ups: skipx.shape = {skipx.shape}")
+
+                    x_pyr = torch.cat([x_pyr, skipx], dim=1)
+
+                    new_skip_x.insert(0, x_pyr)
+                skip_x = [*new_skip_x]
+                print(f"chaning skip connection")
+                print(f"new skip_x.shapes = {','.join([str(skipx.shape) for skipx in skip_x])}")
+
             if block_i in self.encoder_skips:
                 skip_x.append(x)
-            x = block_op(x, batch)
+                print(f"saving skip connection")
+                print(f"new skip_x.shapes = {','.join([str(skipx.shape) for skipx in skip_x])}")
 
+            x = block_op(x, batch)
+            print(f"out x.shape = {x.shape}\n")
+
+        print(f"decoding: out x.shape = {x.shape}")
         for block_i, block_op in enumerate(self.decoder_blocks):
+            print(f"{block_i}.{str(block_op).split('(')[0][:-1]}:\nin x.shape = {x.shape}")
             if block_i in self.decoder_concats:
-                x = torch.cat([x, skip_x.pop()], dim=1)
-            x = block_op(x, batch)
+                skipx = skip_x.pop()
+                print("concat connection")
+                print(f"{block_i} ups: x.shape = {x.shape}")
+                print(f"{block_i} ups: skipx.shape = {skipx.shape}")
 
+                x = torch.cat([x, skipx], dim=1)
+                print(f"{block_i} pyr ups: pyt x.shape = {x.shape}")
+            x = block_op(x, batch)
+            print(f"out x.shape = {x.shape}\n")
         # Head of network
+        print(f"mlp_head: out x.shape = {x.shape}")
         x = self.head_mlp(x, batch)
+        print(f"mlp_softmax: out x.shape = {x.shape}")
         x = self.head_softmax(x, batch)
+        print(f"final: out x.shape = {x.shape}")
 
         return x
 
@@ -392,24 +431,3 @@ class KPFCNN(nn.Module):
         correct = (predicted == target).sum().item()
 
         return correct / total
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
