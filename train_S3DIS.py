@@ -66,28 +66,65 @@ class S3DISConfig(Config):
     #########################
 
     # # Define layers
-    architecture = ['simple',
-                    'resnetb',
-                    'resnetb_strided',
-                    'resnetb',
-                    'resnetb',
-                    'resnetb_strided',
-                    'resnetb',
-                    'resnetb',
-                    'resnetb_strided',
-                    'resnetb_deformable',
-                    'resnetb_deformable',
-                    'resnetb_deformable_strided',
-                    'resnetb_deformable',
-                    'resnetb_deformable',
+    # architecture = ['simple',  # 0: 5 -> 32
+    #                 'resnetb',  # 1: 32 -> 64
+    #                 'resnetb_strided',  # 2: 64 -> 64
+    #
+    #                 'resnetb',  # 3: 64 -> 128
+    #                 'resnetb_strided',  # 4: 128 -> 128
+    #                 # 'resnet_pyramid',
+    #
+    #                 'resnetb',  # 5: 128 -> 256
+    #                 'resnetb_strided',  # 6: 256 -> 256
+    #                 # 'resnet_pyramid',
+    #
+    #                 'resnetb_deformable',  # 7: 256 -> 512
+    #                 'resnetb_deformable_strided',  # 8: 512 -> 512
+    #
+    #                 'resnetb_deformable',  # 9: 512 -> 512
+    #
+    #                 'nearest_upsample',  #
+    #                 'unary',
+    #
+    #                 'nearest_upsample',
+    #                 'unary',
+    #
+    #                 'nearest_upsample',
+    #                 'unary',
+    #
+    #                 'nearest_upsample',
+    #                 'unary'
+    #                 ]
+
+    architecture = ['simple',  # 0: 5 -> 32
+                    'resnetb',  # 1: 32 -> 64
+                    'resnetb_strided',  # 2: 64 -> 64
+
+                    'resnetb',  # 3: 64 -> 128
+                    'resnetb_strided',  # 4: 128 -> 128
+
+                    'resnetb',  # 5: 128 -> 256
+                    # 'resnetb_strided',  # 6: 256 -> 256
+                    'resnetb_strided_pyramid',
+
+                    'resnetb_deformable',  # 7: 256 -> 512
+                    # 'resnetb_deformable_strided',  # 8: 512 -> 512
+                    'resnetb_deformable_strided_pyramid',
+
+                    'resnetb_deformable',  # 9: 512 -> 1024
+
+                    'nearest_upsample',  #
+                    'unary',
+
                     'nearest_upsample',
                     'unary',
+
                     'nearest_upsample',
                     'unary',
+
                     'nearest_upsample',
-                    'unary',
-                    'nearest_upsample',
-                    'unary']
+                    'unary'
+                    ]
 
     # Define layers
     # architecture = ['simple',
