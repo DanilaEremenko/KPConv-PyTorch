@@ -546,8 +546,8 @@ class PyramidBlock(nn.Module):
                 PyramidUpsample(
                     us=NearestUpsampleBlock(layer_ind - i),
                     ub=UnaryBlock(
-                        in_dim // 2 ** (layer_ind - pyr_i + 1),
-                        min(64, out_dim // 2 ** (layer_ind - pyr_i + 2)),
+                        in_dim // 2 ** (layer_ind - pyr_i) + in_dim // 2 ** (layer_ind - pyr_i + 1),
+                        out_dim // 2 ** (layer_ind - pyr_i + 1),
                         config.use_batch_norm,
                         config.batch_norm_momentum
                     )
