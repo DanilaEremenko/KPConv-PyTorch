@@ -66,19 +66,20 @@ class DalesDataset(PointCloudDataset):
         ############
 
         # Dict from labels to names
-        self.label_to_names = {0: 'ceiling',
-                               1: 'floor',
-                               2: 'wall',
-                               3: 'beam',
-                               4: 'column',
-                               5: 'window',
-                               6: 'door',
-                               7: 'chair',
-                               8: 'table',
-                               9: 'bookcase',
-                               10: 'sofa',
-                               11: 'board',
-                               12: 'clutter'}
+        self.label_to_names = {0: 'unknown',
+                               1: 'Ground',
+                               2: 'Vegetation',
+                               3: 'Cars',
+                               4: 'Trucks',
+                               5: 'Power lines',
+                               6: 'Fences',
+                               7: 'Poles',
+                               8: 'Buildings',
+                               # 9: 'Fake Buildings 1',
+                               # 10: 'Fake Buildings 2',
+                               # 11: 'Fake Buildings 3',
+                               # 12: 'Fake Buildings 4'
+                               }
 
         # Initialize a bunch of variables concerning class labels
         self.init_labels()
