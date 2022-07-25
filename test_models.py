@@ -31,6 +31,7 @@ import torch
 # Dataset
 from datasets.ModelNet40 import *
 from datasets.S3DIS import *
+from datasets.Dales import *
 from datasets.SemanticKitti import *
 from torch.utils.data import DataLoader
 
@@ -170,6 +171,10 @@ if __name__ == '__main__':
         test_dataset = S3DISDataset(config, set='validation', use_potentials=True)
         test_sampler = S3DISSampler(test_dataset)
         collate_fn = S3DISCollate
+    elif config.dataset == 'Dales':
+        test_dataset = DalesDataset(config, set='validation', use_potentials=True)
+        test_sampler = DalesSampler(test_dataset)
+        collate_fn = DalesCollate
     elif config.dataset == 'SemanticKitti':
         test_dataset = SemanticKittiDataset(config, set=set, balance_classes=False)
         test_sampler = SemanticKittiSampler(test_dataset)
