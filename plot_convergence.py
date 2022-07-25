@@ -814,7 +814,11 @@ if __name__ == '__main__':
     elif config.dataset_task == 'cloud_segmentation':
         if config.dataset.startswith('S3DIS'):
             dataset = S3DISDataset(config, load_data=False)
-            compare_convergences_segment(dataset, logs, logs_names)
+        elif config.dataset.startswith('Dales'):
+            dataset = DalesDataset(config, load_data=False)
+        else:
+            raise Exception("Undefined dataset")
+        compare_convergences_segment(dataset, logs, logs_names)
     elif config.dataset_task == 'slam_segmentation':
         if config.dataset.startswith('SemanticKitti'):
             dataset = SemanticKittiDataset(config)
