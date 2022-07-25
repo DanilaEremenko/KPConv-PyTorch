@@ -645,7 +645,8 @@ class DalesDataset(PointCloudDataset):
 
                 # read ply with data
                 data = read_ply(sub_ply_file)
-                sub_colors = np.vstack((data['reflectance1'], data['reflectance2'], data['reflectance3'])).T
+                # sub_colors = np.vstack((data['reflectance1'], data['reflectance2'], data['reflectance3'])).T
+                sub_colors = np.vstack((data['x'], data['y'], data['z'])).T
                 sub_labels = data['class']
 
                 # Read pkl with search tree
