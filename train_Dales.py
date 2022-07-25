@@ -54,7 +54,7 @@ class DalesConfig(Config):
     ####################
 
     # Dataset name
-    dataset = 'S3DIS'
+    dataset = 'Dales'
 
     # Number of classes in the dataset (This value is overwritten by dataset class when Initializating dataset).
     num_classes = None
@@ -125,10 +125,10 @@ class DalesConfig(Config):
     num_kernel_points = 15
 
     # Radius of the input sphere (decrease value to reduce memory cost)
-    in_radius = 1.2
+    in_radius = 8.0
 
     # Size of the first subsampling grid in meter (increase value to reduce memory cost)
-    first_subsampling_dl = 0.06
+    first_subsampling_dl = 0.33
 
     # Radius of convolution in "number grid cell". (2.5 is the standard value)
     conv_radius = 2.5
